@@ -5,13 +5,24 @@ run: build
 
 .PHONY: build
 build:
-	rm -rf build/elm.js elm-stuff
-	cd cli && elm make Main.elm --output ../build/elm.js
+	@echo "Building the CLI"
+	@rm -rf build/elm.js elm-stuff cli/elm-stuff
+	@cd cli && elm make Main.elm --output ../build/elm.js
 
 .PHONY: test
-test:
-	elm make --output /dev/null # build the library just to test it compiles
-	elm-test
+test: end-to-end-test unit-test
+
+.PHONY: unit-test
+unit-test:
+	@echo "Running unit tests"
+	@rm -rf elm-stuff
+	@elm make --output /dev/null # build the library just to test it compiles
+	@elm-test
+
+.PHONY: end-to-end-test
+end-to-end-test: build
+	@echo "Running end-to-end tests"
+	@$(MAKE) -C end-to-end-tests clean run
 
 .PHONY: format
 format:

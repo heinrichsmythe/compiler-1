@@ -10,12 +10,10 @@ const {registerPort} = require('./utils.js');
   console.log('-- STARTING THE COMPILER --');
   console.log('---------------------------');
 
-  const exampleProjectPath = 'example-project';
-
   const app = Elm.Main.init({
     flags: {
       mainFilePath: 'src/Main.elm',
-      elmJson: await fs.readFile(`${exampleProjectPath}/elm.json`, {encoding: 'utf8'}),
+      elmJson: await fs.readFile('elm.json', {encoding: 'utf8'}),
     }
   });
 
@@ -29,7 +27,7 @@ const {registerPort} = require('./utils.js');
   });
   registerPort(app, 'read', async function(filename) {
     try {
-      const contents = await fs.readFile(`${exampleProjectPath}/${filename}`, {encoding: 'utf8'});
+      const contents = await fs.readFile(filename, {encoding: 'utf8'});
       app.ports.readSubscription.send({
         filePath: filename,
         fileContents: contents,
@@ -47,12 +45,12 @@ const {registerPort} = require('./utils.js');
       }
     }
   });
-  registerPort(app, 'write', async function({filePath,contents}) {
+  registerPort(app, 'writeToFile', async function({filePath,fileContents}) {
     console.log('---------------------------');
     console.log('-- WRITING TO FS ----------');
     console.log('---------------------------');
-    console.log(contents);
-    await fs.writeFile(`${exampleProjectPath}/${filePath}`, contents);
+    console.log(fileContents);
+    await fs.writeFile(filePath, fileContents);
   });
 
 })();
